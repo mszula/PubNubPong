@@ -39,16 +39,18 @@ if (createGameButton === null) {
 const urlChannelId = getUrlChannelId()
 if (urlChannelId) {
     const communication = new Communication(urlChannelId, false)
-    if (!(await communication.checkPresence())) {
-        const emptyRoomError = document.getElementById("emptyRoomError")
-        if (emptyRoomError === null) {
-            throw new Error("Massive error")
+    communication.checkPresence().then((isPresent: boolean) => {
+        if (!isPresent) {
+            const emptyRoomError = document.getElementById("emptyRoomError")
+            if (emptyRoomError === null) {
+                throw new Error("Massive error")
+            }
+            emptyRoomError.style.display = "block"
+            replaceChannelIdInUrl("")
+        } else {
+            createGameButton.textContent = "Join"
         }
-        emptyRoomError.style.display = "block"
-        replaceChannelIdInUrl("")
-    } else {
-        createGameButton.textContent = "Join"
-    }
+    })
 }
 
 const dialogStart = document.getElementById("dialog-start") as HTMLDialogElement
