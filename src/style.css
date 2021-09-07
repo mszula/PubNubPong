@@ -1,0 +1,36 @@
+@import "../node_modules/nes.css/css/nes.css";
+
+html,
+body,
+pre,
+code,
+kbd,
+samp {
+    font-family: "Press Start 2P";
+}
+
+html {
+    cursor: autos;
+}
+
+body {
+    background: black;
+}
+
+#pongBox {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+}
+#pong {
+    /* transform: scale(1.8); */
+    width: 750px;
+    height: 585px;
+}
+
+.nes-field {
+    margin-bottom: 16px;
+}
