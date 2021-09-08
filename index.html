@@ -12,35 +12,29 @@
       <canvas width="750" height="585" id="pong"></canvas>
     </div>
 
-    <section>
-      <dialog class="nes-dialog" id="dialog-start">
-        <form method="dialog">
-          <p class="title">PubNubPong</p>
-          <p class="nes-text is-error" style="display: none;" id="emptyRoomError">No One is present in this room.<br>Please create a new game!</p>
-            <div class="nes-field">
-              <label for="name_field">Your name</label>
-              <input type="text" id="nameInput" class="nes-input">
-            </div>
-            <button class="nes-btn is-primary" id="startGame">Let's pong!</button>
-        </form>
-      </dialog>
-    </section>
+    <div class="dialog" id="dialogStart" style="display: flex;">
+      <div class="dialog-content">
+        <p class="title">PubNubPong</p>
+        <p class="nes-text is-error" style="display: none;" id="emptyRoomError">No one is in this room.<br>Please create a new game!</p>
+        <div class="nes-field">
+          <label for="name_field">Your name</label>
+          <input type="text" id="nameInput" class="nes-input">
+        </div>
+        <button class="nes-btn is-primary" id="startGame">Let's pong!</button>
+      </div>
+    </div>
 
-    <section>
-      <dialog class="nes-dialog" id="dialog-waiting">
-        <form method="dialog">
+    <div class="dialog" id="dialogWaiting">
+      <div class="dialog-content">
           <p class="title" style="margin-bottom: 0;">Waiting for opponent...</p>
-        </form>
-      </dialog>
-    </section>
+      </div>
+    </div>
 
-    <section>
-      <dialog class="nes-dialog" id="dialogLeftTheGame">
-        <form method="dialog">
+    <div class="dialog" id="dialogLeftTheGame">
+      <div class="dialog-content">
           <p class="title" style="margin-bottom: 0;"><span id="opponentName"></span> left the game!</p>
-        </form>
-      </dialog>
-    </section>
+      </div>
+    </div>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

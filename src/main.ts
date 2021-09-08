@@ -30,6 +30,7 @@ const replaceChannelIdInUrl = (channelId: string) => {
     history.replaceState(null, "", `?${currentUrl.toString()}`)
 }
 
+const dialogStart = document.getElementById("dialogStart") as HTMLElement
 const nameInput = document.getElementById("nameInput") as HTMLInputElement
 const createGameButton = document.getElementById("startGame")
 if (createGameButton === null) {
@@ -45,7 +46,7 @@ if (urlChannelId) {
             if (emptyRoomError === null) {
                 throw new Error("Massive error")
             }
-            emptyRoomError.style.display = "block"
+            roomError.style.display = "block"
             replaceChannelIdInUrl("")
         } else {
             createGameButton.textContent = "Join"
@@ -53,11 +54,8 @@ if (urlChannelId) {
     })
 }
 
-const dialogStart = document.getElementById("dialog-start") as HTMLDialogElement
-// @ts-ignore
-dialogStart.showModal()
-
 createGameButton.onclick = () => {
+    dialogStart.style.display = "none"
     let pong: Pong | null = null
 
     if (getUrlChannelId()) {
@@ -65,12 +63,11 @@ createGameButton.onclick = () => {
         pong.startGame().gameLoop()
     } else {
         pong = prepareGameAsHost()
-        const dialogWaiting = document.getElementById("dialog-waiting") as HTMLDialogElement
-        // @ts-ignore
-        dialogWaiting.showModal()
+        const dialogWaiting = document.getElementById("dialogWaiting") as HTMLElement
+        dialogWaiting.style.display = "flex"
 
         addEventListener(PongEventsEnum.HelloOpponent, (() => {
-            dialogWaiting.remove()
+            dialogWaiting.style.display = "none"
 
             pong?.startGame().gameLoop()
         }) as EventListener)
@@ -84,9 +81,8 @@ createGameButton.onclick = () => {
             opponentNameSpan.innerHTML = pong?.getOpponentName() || ""
         }
 
-        const dialogLeftTheGame = document.getElementById("dialogLeftTheGame") as HTMLDialogElement
-        // @ts-ignore
-        dialogLeftTheGame.showModal()
+        const dialogLeftTheGame = document.getElementById("dialogLeftTheGame") as HTMLElement
+        dialogLeftTheGame.style.display = "flex"
     }) as EventListener)
 }
 
