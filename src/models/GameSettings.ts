@@ -6,5 +6,6 @@ export default interface GameSettings {
     canvas: {
         height: number
         width: number
+        playerInfoGap: number
     }
 }

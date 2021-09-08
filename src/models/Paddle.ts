@@ -12,14 +12,16 @@ export default abstract class Paddle implements GameObject {
     y: number
     width: number
     height: number
+    gameSettings: GameSettings
     private velocity: number
 
     constructor(gameSettings: GameSettings) {
         this.x = this.getStartCoordinates(gameSettings).x
         this.y = this.getStartCoordinates(gameSettings).y
         this.width = gameSettings.grid
-        this.height = gameSettings.grid * 5
+        this.height = gameSettings.paddleHeight
         this.velocity = 0
+        this.gameSettings = gameSettings
     }
 
     public move(position: Position) {
@@ -34,6 +36,14 @@ export default abstract class Paddle implements GameObject {
     public updatePosition(communication: Communication): Paddle {
         if (this.velocity !== 0) {
             this.y += this.velocity
+
+            const minPaddleY = this.gameSettings.grid + this.gameSettings.canvas.playerInfoGap
+            const maxPaddleY = this.gameSettings.canvas.height - this.gameSettings.grid - this.gameSettings.paddleHeight
+            if (this.y < minPaddleY) {
+                this.y = minPaddleY
+            } else if (this.y > maxPaddleY) {
+                this.y = maxPaddleY
+            }
 
             communication.publish({
                 type: PongSignalsEnum.MovePaddle,

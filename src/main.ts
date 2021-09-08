@@ -14,8 +14,9 @@ const gameSettings = {
     ballSpeed: 5,
     paddleSpeed: 6,
     canvas: {
-        height: 585,
+        height: 615,
         width: 750,
+        playerInfoGap: 30,
     },
 } as GameSettings
 
@@ -32,10 +33,11 @@ const replaceChannelIdInUrl = (channelId: string) => {
 
 const dialogStart = document.getElementById("dialogStart") as HTMLElement
 const nameInput = document.getElementById("nameInput") as HTMLInputElement
-const createGameButton = document.getElementById("startGame")
-if (createGameButton === null) {
-    throw new Error("Massive error")
-}
+const createGameButton = document.getElementById("startGame") as HTMLButtonElement
+const canvas = document.getElementById("pong") as HTMLCanvasElement
+canvas.height = gameSettings.canvas.height
+canvas.width = gameSettings.canvas.width
+canvas.style.transform = `scale(${window.innerHeight / gameSettings.canvas.height - 0.1})`
 
 const urlChannelId = getUrlChannelId()
 if (urlChannelId) {
@@ -93,6 +95,7 @@ const prepareGameAsHost = (): Pong => {
     replaceChannelIdInUrl(channelId)
 
     return new Pong(
+        canvas,
         gameSettings,
         new Communication(channelId, true).subscribe(),
         new Player(new LeftPaddle(gameSettings), nameInput.value)
@@ -103,6 +106,7 @@ const prepareGameAsOpponent = (): Pong => {
     const channelId = getUrlChannelId() || ""
 
     return new Pong(
+        canvas,
         gameSettings,
         new Communication(channelId, false).subscribe(),
         new Player(new RightPaddle(gameSettings), nameInput.value)

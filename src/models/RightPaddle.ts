@@ -12,7 +12,7 @@ export default class RightPaddle extends Paddle {
     public getStartCoordinates(gameSettings: GameSettings): Position {
         return {
             x: gameSettings.canvas.width - gameSettings.grid * 3,
-            y: gameSettings.canvas.height / 2 - gameSettings.paddleHeight / 2,
+            y: (gameSettings.canvas.height - gameSettings.canvas.playerInfoGap) / 2 - gameSettings.paddleHeight / 2,
         }
     }
 

@@ -1,6 +1,6 @@
 import Communication from "./communication"
 import { PaddlePositionEnum } from "./enum/PaddlePositionEnum"
-import { PongEventsEnum } from "./enum/PongEventsEnum"
+import { PongSignalsEnum, PongEventsEnum } from "./enum/PongEventsEnum"
 import Ball from "./models/Ball"
 import GameSettings from "./models/GameSettings"
 import MoveBallMessage from "./models/message/MoveBalllMessage"
@@ -23,16 +23,14 @@ export class Pong {
     private opponent: Player
     private renderGame: boolean
 
-    constructor(gameSettings: GameSettings, communication: Communication, me: Player) {
+    constructor(canvas: HTMLCanvasElement, gameSettings: GameSettings, communication: Communication, me: Player) {
+        this.canvas = canvas
         this.communication = communication
         this.gameSettings = gameSettings
         this.me = me
         this.renderGame = false
 
-        const canvas = document.getElementById("pong") as HTMLCanvasElement
         const context = canvas.getContext("2d")
-
-        this.canvas = canvas
         if (!context) {
             throw new Error("Canvas error!")
         }
@@ -45,8 +43,6 @@ export class Pong {
         } else {
             this.opponent = new Player(new LeftPaddle(this.gameSettings), "")
         }
-
-        this.context.fillStyle = "white"
 
         this.addListeners()
     }
@@ -73,6 +69,8 @@ export class Pong {
 
     public gameLoop(): this {
         requestAnimationFrame(() => this.renderGame && this.gameLoop())
+
+        this.context.fillStyle = "white"
 
         if (collides(this.ball, this.me.paddle)) {
             this.ball.bounce(this.me.paddle, this.communication)
@@ -104,6 +102,20 @@ export class Pong {
 
         this.me.paddle.updatePosition(this.communication).draw(this.context)
         this.opponent.paddle.updatePosition(this.communication).draw(this.context)
+
+        this.context.fillStyle = "grey"
+        this.context.fillRect(
+            0,
+            this.gameSettings.canvas.playerInfoGap,
+            this.gameSettings.canvas.width,
+            this.gameSettings.grid
+        )
+        this.context.fillRect(
+            0,
+            this.gameSettings.canvas.height - this.gameSettings.grid,
+            this.gameSettings.canvas.width,
+            this.gameSettings.canvas.height
+        )
 
         this.drawPlayersInfo()
 

@@ -9,7 +9,7 @@
   </head>
   <body>
     <div id="pongBox">
-      <canvas width="750" height="585" id="pong"></canvas>
+      <canvas id="pong"></canvas>
     </div>
 
     <div class="dialog" id="dialogStart" style="display: flex;">
@@ -18,7 +18,7 @@
         <p class="nes-text is-error" style="display: none;" id="emptyRoomError">No one is in this room.<br>Please create a new game!</p>
         <p class="nes-text is-error" style="display: none;" id="fullRoomError">This room is full.<br>Please create a new game!</p>
         <div class="nes-field">
-          <label for="name_field">Your name</label>
+          <label for="nameInput">Your name</label>
           <input type="text" id="nameInput" class="nes-input">
         </div>
         <button class="nes-btn is-primary" id="startGame">Let's pong!</button>

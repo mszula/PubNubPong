@@ -16,18 +16,16 @@ export default class Ball implements GameObject {
     xVelocity: number = 0
     yVelocity: number = 0
     moving: boolean = false
-    private canvasHeight: number
+    gameSettings: GameSettings
     private lastPublishTime: number = 0
-    private ballSpeed: number
 
     constructor(gameSettings: GameSettings) {
         this.reset(gameSettings)
         this.width = gameSettings.grid
         this.height = gameSettings.grid
-        this.ballSpeed = gameSettings.ballSpeed
-        this.canvasHeight = gameSettings.canvas.height
-        this.xVelocity = this.ballSpeed
-        this.yVelocity = -this.ballSpeed
+        this.gameSettings = gameSettings
+        this.xVelocity = this.gameSettings.ballSpeed
+        this.yVelocity = -this.gameSettings.ballSpeed
     }
 
     public reset(gameSettings: GameSettings) {
@@ -55,11 +53,11 @@ export default class Ball implements GameObject {
             this.x += this.xVelocity
             this.y += this.yVelocity
 
-            if (this.y < this.width) {
-                this.y = this.width
+            if (this.y < this.width + this.gameSettings.canvas.playerInfoGap) {
+                this.y = this.width + this.gameSettings.canvas.playerInfoGap
                 this.yVelocity *= -1
-            } else if (this.y + this.width > this.canvasHeight - this.width) {
-                this.y = this.canvasHeight - this.width * 2
+            } else if (this.y + this.width > this.gameSettings.canvas.height - this.width) {
+                this.y = this.gameSettings.canvas.height - this.width * 2
                 this.yVelocity *= -1
             }
 
