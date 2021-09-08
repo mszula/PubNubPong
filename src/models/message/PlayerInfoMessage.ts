@@ -1,7 +1,7 @@
-import { PongEventsEnum } from "../../enum/PongEventsEnum"
+import { PongSignalsEnum } from "../../enum/PongEventsEnum"
 import PongMessage from "./PongMessage"
 
 export default interface PlayerInfoMessage extends PongMessage {
-    type: PongEventsEnum.PlayerInfo
+    type: PongSignalsEnum.PlayerInfo
     name: string
 }

@@ -1,5 +1,5 @@
 import Communication from "../communication"
-import { PongEventsEnum } from "../enum/PongEventsEnum"
+import { PongSignalsEnum } from "../enum/PongEventsEnum"
 import GameSettings from "./GameSettings"
 import { GameObject } from "./GameObject"
 import BallPosition from "./BallPosition"
@@ -85,12 +85,12 @@ export default class Ball implements GameObject {
     private publish(communication: Communication, force?: boolean) {
         if ((communication.isHost && this.lastPublishTime + publishPeriod < Date.now()) || force) {
             communication.publish({
-                type: PongEventsEnum.MoveBall,
+                type: PongSignalsEnum.MoveBall,
                 x: this.x,
                 y: this.y,
-                xVelocity: this.xVelocity,
-                yVelocity: this.yVelocity,
-                moving: this.moving,
+                d: this.xVelocity,
+                c: this.yVelocity,
+                m: this.moving,
             } as MoveBallMessage)
             this.lastPublishTime = Date.now()
         }

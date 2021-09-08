@@ -54,7 +54,7 @@ export class Pong {
     public startGame(): this {
         this.renderGame = true
         this.communication.publish({
-            type: PongEventsEnum.PlayerInfo,
+            type: PongSignalsEnum.PlayerInfo,
             name: this.me.name,
         } as PlayerInfoMessage)
 
@@ -91,7 +91,7 @@ export class Pong {
 
             if (myGoal) {
                 this.communication.publish({
-                    type: PongEventsEnum.Goal,
+                    type: PongSignalsEnum.Goal,
                     opponentPoints: this.me.points,
                 } as GoalMessage)
                 this.opponent.goal()
@@ -137,7 +137,7 @@ export class Pong {
         }) as EventListener)
 
         addEventListener(PongEventsEnum.MoveBall, ((e: CustomEvent<MoveBallMessage>) => {
-            this.ball.move({ ...e.detail })
+            this.ball.move({ ...e.detail, xVelocity: e.detail.d, yVelocity: e.detail.c, moving: e.detail.m })
         }) as EventListener)
 
         addEventListener(PongEventsEnum.PlayerInfo, ((e: CustomEvent<PlayerInfoMessage>) => {

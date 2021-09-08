@@ -1,6 +1,5 @@
-import { PongEventsEnum } from "../../enum/PongEventsEnum"
+import { PongSignalsEnum } from "../../enum/PongEventsEnum"
 
 export default interface PongMessage {
-    type: PongEventsEnum
-    uuid: string
+    type: PongSignalsEnum
 }

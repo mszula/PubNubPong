@@ -1,6 +1,5 @@
 import { PongEventsEnum } from "../../enum/PongEventsEnum"
-import PongMessage from "./PongMessage"
 
-export default interface HelloOpponentMesssage extends PongMessage {
+export default interface HelloOpponentMesssage {
     type: PongEventsEnum.HelloOpponent
 }

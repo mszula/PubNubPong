@@ -1,6 +1,6 @@
-import Pubnub, { generateUUID, MessageEvent, PresenceEvent } from "pubnub"
+import Pubnub, { generateUUID, PresenceEvent, SignalEvent } from "pubnub"
 import MovePaddleMessage from "./models/message/MovePaddleMessage"
-import { PongEventsEnum } from "./enum/PongEventsEnum"
+import { PongEventsEnum, PongSignalsEnum } from "./enum/PongEventsEnum"
 import PongMessage from "./models/message/PongMessage"
 import HelloOpponentMesssage from "./models/message/HelloOpponentMesssage"
 import MoveBallMessage from "./models/message/MoveBalllMessage"
@@ -11,8 +11,8 @@ import GoalMessage from "./models/message/GoalMessage"
 export default class Communication {
     isHost: boolean
     private pubnub: Pubnub
-    private channelId: string
-    private uuid: string
+    readonly channelId: string
+    readonly uuid: string
 
     constructor(channelId: string, isHost: boolean) {
         this.uuid = generateUUID()
@@ -39,37 +39,38 @@ export default class Communication {
         })
 
         this.pubnub.addListener({
-            message: (messageEvent: MessageEvent): void => {
-                if (messageEvent.message.uuid === this.uuid) {
+            signal: (signal: SignalEvent): void => {
+                console.log(signal)
+                if (signal.publisher === this.uuid) {
                     return
                 }
 
-                switch (messageEvent.message.type) {
-                    case PongEventsEnum.MovePaddle:
+                switch (signal.message.type) {
+                    case PongSignalsEnum.MovePaddle:
                         dispatchEvent(
                             new CustomEvent<MovePaddleMessage>(PongEventsEnum.MovePaddle, {
-                                detail: { ...messageEvent.message },
+                                detail: { ...signal.message },
                             })
                         )
                         break
-                    case PongEventsEnum.MoveBall:
+                    case PongSignalsEnum.MoveBall:
                         dispatchEvent(
                             new CustomEvent<MoveBallMessage>(PongEventsEnum.MoveBall, {
-                                detail: { ...messageEvent.message },
+                                detail: { ...signal.message },
                             })
                         )
                         break
-                    case PongEventsEnum.PlayerInfo:
+                    case PongSignalsEnum.PlayerInfo:
                         dispatchEvent(
                             new CustomEvent<PlayerInfoMessage>(PongEventsEnum.PlayerInfo, {
-                                detail: { ...messageEvent.message },
+                                detail: { ...signal.message },
                             })
                         )
                         break
-                    case PongEventsEnum.Goal:
+                    case PongSignalsEnum.Goal:
                         dispatchEvent(
                             new CustomEvent<GoalMessage>(PongEventsEnum.Goal, {
-                                detail: { ...messageEvent.message },
+                                detail: { ...signal.message },
                             })
                         )
                         break
@@ -84,14 +85,14 @@ export default class Communication {
                     case "join":
                         dispatchEvent(
                             new CustomEvent<HelloOpponentMesssage>(PongEventsEnum.HelloOpponent, {
-                                detail: { type: PongEventsEnum.HelloOpponent, uuid: event.uuid },
+                                detail: { type: PongEventsEnum.HelloOpponent },
                             })
                         )
                         break
                     case "leave":
                         dispatchEvent(
                             new CustomEvent<LeftTheGameMesssage>(PongEventsEnum.LeftTheGame, {
-                                detail: { type: PongEventsEnum.LeftTheGame, uuid: event.uuid },
+                                detail: { type: PongEventsEnum.LeftTheGame },
                             })
                         )
                         break
@@ -107,9 +108,9 @@ export default class Communication {
     }
 
     public publish(message: PongMessage): this {
-        this.pubnub.publish({
+        this.pubnub.signal({
             channel: this.getChannelName(),
-            message: { ...message, uuid: this.uuid },
+            message: { ...message },
         })
 
         return this

@@ -2,7 +2,7 @@ import { GameObject } from "./GameObject"
 import Position from "./Position"
 import Communication from "../communication"
 import MovePaddleMessage from "./message/MovePaddleMessage"
-import { PongEventsEnum } from "../enum/PongEventsEnum"
+import { PongSignalsEnum } from "../enum/PongEventsEnum"
 import Ball from "./Ball"
 import GameSettings from "./GameSettings"
 import { PaddlePositionEnum } from "../enum/PaddlePositionEnum"
@@ -36,7 +36,7 @@ export default abstract class Paddle implements GameObject {
             this.y += this.velocity
 
             communication.publish({
-                type: PongEventsEnum.MovePaddle,
+                type: PongSignalsEnum.MovePaddle,
                 x: this.x,
                 y: this.y,
                 position: this.getPaddlePosition(),
