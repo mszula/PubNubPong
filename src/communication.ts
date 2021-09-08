@@ -9,122 +9,117 @@ import LeftTheGameMesssage from "./models/message/LeftTheGameMesssage"
 import GoalMessage from "./models/message/GoalMessage"
 
 export default class Communication {
-    isHost: boolean
-    private pubnub: Pubnub
-    readonly channelId: string
-    readonly uuid: string
+  isHost: boolean
+  private pubnub: Pubnub
+  readonly channelId: string
+  readonly uuid: string
 
-    constructor(channelId: string, isHost: boolean) {
-        this.uuid = generateUUID()
-        this.channelId = channelId
-        this.isHost = isHost
+  constructor(channelId: string, isHost: boolean) {
+    this.uuid = generateUUID()
+    this.channelId = channelId
+    this.isHost = isHost
 
-        this.pubnub = new Pubnub({
-            publishKey: String(import.meta.env.VITE_PUBNUB_PUBLISH_KEY),
-            subscribeKey: String(import.meta.env.VITE_PUBNUB_SUBSCRIBE_KEY),
-            uuid: this.uuid,
-        })
-    }
+    this.pubnub = new Pubnub({
+      publishKey: String(import.meta.env.VITE_PUBNUB_PUBLISH_KEY),
+      subscribeKey: String(import.meta.env.VITE_PUBNUB_SUBSCRIBE_KEY),
+      uuid: this.uuid,
+    })
+  }
 
-    public subscribe(): this {
-        this.pubnub.subscribe({
-            channels: [this.getChannelName()],
-            withPresence: true,
-        })
+  public subscribe(): this {
+    this.pubnub.subscribe({
+      channels: [this.getChannelName()],
+      withPresence: true,
+    })
 
-        window.addEventListener("beforeunload", () => {
-            this.pubnub.unsubscribe({
-                channels: [this.getChannelName()],
-            })
-        })
+    window.addEventListener("beforeunload", () => {
+      this.pubnub.unsubscribe({
+        channels: [this.getChannelName()],
+      })
+    })
 
-        this.pubnub.addListener({
-            signal: (signal: SignalEvent): void => {
-                console.log(signal)
-                if (signal.publisher === this.uuid) {
-                    return
-                }
+    this.pubnub.addListener({
+      signal: (signal: SignalEvent): void => {
+        if (signal.publisher === this.uuid) {
+          return
+        }
 
-                switch (signal.message.type) {
-                    case PongSignalsEnum.MovePaddle:
-                        dispatchEvent(
-                            new CustomEvent<MovePaddleMessage>(PongEventsEnum.MovePaddle, {
-                                detail: { ...signal.message },
-                            })
-                        )
-                        break
-                    case PongSignalsEnum.MoveBall:
-                        dispatchEvent(
-                            new CustomEvent<MoveBallMessage>(PongEventsEnum.MoveBall, {
-                                detail: { ...signal.message },
-                            })
-                        )
-                        break
-                    case PongSignalsEnum.PlayerInfo:
-                        dispatchEvent(
-                            new CustomEvent<PlayerInfoMessage>(PongEventsEnum.PlayerInfo, {
-                                detail: { ...signal.message },
-                            })
-                        )
-                        break
-                    case PongSignalsEnum.Goal:
-                        dispatchEvent(
-                            new CustomEvent<GoalMessage>(PongEventsEnum.Goal, {
-                                detail: { ...signal.message },
-                            })
-                        )
-                        break
-                }
-            },
-            presence: (event: PresenceEvent) => {
-                if (event.uuid === this.uuid) {
-                    return
-                }
+        switch (signal.message.type) {
+          case PongSignalsEnum.MovePaddle:
+            dispatchEvent(
+              new CustomEvent<MovePaddleMessage>(PongEventsEnum.MovePaddle, {
+                detail: { ...signal.message },
+              })
+            )
+            break
+          case PongSignalsEnum.MoveBall:
+            dispatchEvent(
+              new CustomEvent<MoveBallMessage>(PongEventsEnum.MoveBall, {
+                detail: { ...signal.message },
+              })
+            )
+            break
+          case PongSignalsEnum.PlayerInfo:
+            dispatchEvent(
+              new CustomEvent<PlayerInfoMessage>(PongEventsEnum.PlayerInfo, {
+                detail: { ...signal.message },
+              })
+            )
+            break
+          case PongSignalsEnum.Goal:
+            dispatchEvent(
+              new CustomEvent<GoalMessage>(PongEventsEnum.Goal, {
+                detail: { ...signal.message },
+              })
+            )
+            break
+        }
+      },
+      presence: (event: PresenceEvent) => {
+        if (event.uuid === this.uuid) {
+          return
+        }
 
-                switch (event.action) {
-                    case "join":
-                        dispatchEvent(
-                            new CustomEvent<HelloOpponentMesssage>(PongEventsEnum.HelloOpponent, {
-                                detail: { type: PongEventsEnum.HelloOpponent },
-                            })
-                        )
-                        break
-                    case "leave":
-                        dispatchEvent(
-                            new CustomEvent<LeftTheGameMesssage>(PongEventsEnum.LeftTheGame, {
-                                detail: { type: PongEventsEnum.LeftTheGame },
-                            })
-                        )
-                        break
-                }
-            },
-            status: (event: any) => {
-                console.log(event)
-                console.log("[STATUS: " + event.category + "] connected to channels: " + event.affectedChannels)
-            },
-        })
+        switch (event.action) {
+          case "join":
+            dispatchEvent(
+              new CustomEvent<HelloOpponentMesssage>(PongEventsEnum.HelloOpponent, {
+                detail: { type: PongEventsEnum.HelloOpponent },
+              })
+            )
+            break
+          case "leave":
+            dispatchEvent(
+              new CustomEvent<LeftTheGameMesssage>(PongEventsEnum.LeftTheGame, {
+                detail: { type: PongEventsEnum.LeftTheGame },
+              })
+            )
+            break
+        }
+      },
+    })
 
-        return this
-    }
+    return this
+  }
 
-    public publish(message: PongMessage): this {
-        this.pubnub.signal({
-            channel: this.getChannelName(),
-            message: { ...message },
-        })
+  public publish(message: PongMessage): this {
+    this.pubnub.signal({
+      channel: this.getChannelName(),
+      message: { ...message },
+    })
 
-        return this
-    }
+    return this
+  }
 
-    public async checkPresence(): Promise<number> {
-        const hereNow = await this.pubnub.hereNow({
-            channels: [this.getChannelName()],
-        })
+  public async checkPresence(): Promise<number> {
+    const hereNow = await this.pubnub.hereNow({
+      channels: [this.getChannelName()],
+    })
 
-        return hereNow.totalOccupancy
-    }
+    return hereNow.totalOccupancy
+  }
 
-    private getChannelName(): string {
-        return `pong.${this.channelId}`
-    }
+  private getChannelName(): string {
+    return `pong.${this.channelId}`
+  }
 }

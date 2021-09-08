@@ -1,4 +1,4 @@
 export enum PaddlePositionEnum {
-    Left = 1,
-    Right = 2,
+  Left = 1,
+  Right = 2,
 }

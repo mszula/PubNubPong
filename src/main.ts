@@ -9,26 +9,26 @@ import RightPaddle from "./models/RightPaddle"
 import GameSettings from "./models/GameSettings"
 
 const gameSettings = {
-    grid: 15,
-    paddleHeight: 80,
-    ballSpeed: 5,
-    paddleSpeed: 6,
-    canvas: {
-        height: 615,
-        width: 750,
-        playerInfoGap: 30,
-    },
+  grid: 15,
+  paddleHeight: 80,
+  ballSpeed: 5,
+  paddleSpeed: 6,
+  canvas: {
+    height: 615,
+    width: 750,
+    playerInfoGap: 30,
+  },
 } as GameSettings
 
 const getUrlChannelId = (): string | null => {
-    const currentUrl = new URLSearchParams(window.location.search)
-    return currentUrl.get("id")
+  const currentUrl = new URLSearchParams(window.location.search)
+  return currentUrl.get("id")
 }
 
 const replaceChannelIdInUrl = (channelId: string) => {
-    const currentUrl = new URLSearchParams(window.location.search)
-    currentUrl.set("id", channelId)
-    history.replaceState(null, "", `?${currentUrl.toString()}`)
+  const currentUrl = new URLSearchParams(window.location.search)
+  currentUrl.set("id", channelId)
+  history.replaceState(null, "", `?${currentUrl.toString()}`)
 }
 
 const dialogStart = document.getElementById("dialogStart") as HTMLElement
@@ -41,76 +41,76 @@ canvas.style.transform = `scale(${window.innerHeight / gameSettings.canvas.heigh
 
 const urlChannelId = getUrlChannelId()
 if (urlChannelId) {
-    const communication = new Communication(urlChannelId, false)
-    communication.checkPresence().then((totalOccupancy: number) => {
-        if (totalOccupancy === 0 || totalOccupancy === 2) {
-            let roomError
-            if (totalOccupancy === 0) {
-                roomError = document.getElementById("emptyRoomError") as HTMLElement
-            } else {
-                roomError = document.getElementById("fullRoomError") as HTMLElement
-            }
-            roomError.style.display = "block"
-            replaceChannelIdInUrl("")
-        } else {
-            createGameButton.textContent = "Join"
-        }
-    })
+  const communication = new Communication(urlChannelId, false)
+  communication.checkPresence().then((totalOccupancy: number) => {
+    if (totalOccupancy === 0 || totalOccupancy === 2) {
+      let roomError
+      if (totalOccupancy === 0) {
+        roomError = document.getElementById("emptyRoomError") as HTMLElement
+      } else {
+        roomError = document.getElementById("fullRoomError") as HTMLElement
+      }
+      roomError.style.display = "block"
+      replaceChannelIdInUrl("")
+    } else {
+      createGameButton.textContent = "Join"
+    }
+  })
 }
 
 createGameButton.onclick = () => {
-    dialogStart.style.display = "none"
-    let pong: Pong | null = null
+  dialogStart.style.display = "none"
+  let pong: Pong | null = null
 
-    if (getUrlChannelId()) {
-        pong = prepareGameAsOpponent()
-        pong.startGame().gameLoop()
-    } else {
-        pong = prepareGameAsHost()
-        const dialogWaiting = document.getElementById("dialogWaiting") as HTMLElement
-        dialogWaiting.style.display = "flex"
+  if (getUrlChannelId()) {
+    pong = prepareGameAsOpponent()
+    pong.startGame().gameLoop()
+  } else {
+    pong = prepareGameAsHost()
+    const dialogWaiting = document.getElementById("dialogWaiting") as HTMLElement
+    dialogWaiting.style.display = "flex"
 
-        addEventListener(PongEventsEnum.HelloOpponent, (() => {
-            dialogWaiting.style.display = "none"
+    addEventListener(PongEventsEnum.HelloOpponent, (() => {
+      dialogWaiting.style.display = "none"
 
-            pong?.startGame().gameLoop()
-        }) as EventListener)
+      pong?.startGame().gameLoop()
+    }) as EventListener)
+  }
+
+  addEventListener(PongEventsEnum.LeftTheGame, (() => {
+    pong?.stopGame()
+
+    const opponentNameSpan = document.getElementById("opponentName")
+    if (opponentNameSpan) {
+      opponentNameSpan.innerHTML = pong?.getOpponentName() || ""
     }
 
-    addEventListener(PongEventsEnum.LeftTheGame, (() => {
-        pong?.stopGame()
-
-        const opponentNameSpan = document.getElementById("opponentName")
-        if (opponentNameSpan) {
-            opponentNameSpan.innerHTML = pong?.getOpponentName() || ""
-        }
-
-        const dialogLeftTheGame = document.getElementById("dialogLeftTheGame") as HTMLElement
-        dialogLeftTheGame.style.display = "flex"
-    }) as EventListener)
+    const dialogLeftTheGame = document.getElementById("dialogLeftTheGame") as HTMLElement
+    dialogLeftTheGame.style.display = "flex"
+  }) as EventListener)
 }
 
 const prepareGameAsHost = (): Pong => {
-    const channelId = generateChannelId()
-    replaceChannelIdInUrl(channelId)
+  const channelId = generateChannelId()
+  replaceChannelIdInUrl(channelId)
 
-    return new Pong(
-        canvas,
-        gameSettings,
-        new Communication(channelId, true).subscribe(),
-        new Player(new LeftPaddle(gameSettings), nameInput.value)
-    )
+  return new Pong(
+    canvas,
+    gameSettings,
+    new Communication(channelId, true).subscribe(),
+    new Player(new LeftPaddle(gameSettings), nameInput.value)
+  )
 }
 
 const prepareGameAsOpponent = (): Pong => {
-    const channelId = getUrlChannelId() || ""
+  const channelId = getUrlChannelId() || ""
 
-    return new Pong(
-        canvas,
-        gameSettings,
-        new Communication(channelId, false).subscribe(),
-        new Player(new RightPaddle(gameSettings), nameInput.value)
-    )
+  return new Pong(
+    canvas,
+    gameSettings,
+    new Communication(channelId, false).subscribe(),
+    new Player(new RightPaddle(gameSettings), nameInput.value)
+  )
 }
 
 // requestAnimationFrame(pong.gameLoop);
