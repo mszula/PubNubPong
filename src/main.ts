@@ -40,11 +40,13 @@ if (createGameButton === null) {
 const urlChannelId = getUrlChannelId()
 if (urlChannelId) {
     const communication = new Communication(urlChannelId, false)
-    communication.checkPresence().then((isPresent: boolean) => {
-        if (!isPresent) {
-            const emptyRoomError = document.getElementById("emptyRoomError")
-            if (emptyRoomError === null) {
-                throw new Error("Massive error")
+    communication.checkPresence().then((totalOccupancy: number) => {
+        if (totalOccupancy === 0 || totalOccupancy === 2) {
+            let roomError
+            if (totalOccupancy === 0) {
+                roomError = document.getElementById("emptyRoomError") as HTMLElement
+            } else {
+                roomError = document.getElementById("fullRoomError") as HTMLElement
             }
             roomError.style.display = "block"
             replaceChannelIdInUrl("")

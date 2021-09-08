@@ -116,12 +116,12 @@ export default class Communication {
         return this
     }
 
-    public async checkPresence(): Promise<boolean> {
+    public async checkPresence(): Promise<number> {
         const hereNow = await this.pubnub.hereNow({
             channels: [this.getChannelName()],
         })
 
-        return hereNow.totalOccupancy > 0
+        return hereNow.totalOccupancy
     }
 
     private getChannelName(): string {
