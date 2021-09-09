@@ -6,6 +6,9 @@ import { PongSignalsEnum } from "../enum/PongEventsEnum"
 import Ball from "./Ball"
 import GameSettings from "./GameSettings"
 import { PaddlePositionEnum } from "../enum/PaddlePositionEnum"
+import PaddlePosition from "./PaddlePosition"
+
+const publishPeriod = 500
 
 export default abstract class Paddle implements GameObject {
   x: number
@@ -14,6 +17,7 @@ export default abstract class Paddle implements GameObject {
   height: number
   gameSettings: GameSettings
   private velocity: number
+  private lastPublishTime: number = 0
 
   constructor(gameSettings: GameSettings) {
     this.x = this.getStartCoordinates(gameSettings).x
@@ -24,16 +28,19 @@ export default abstract class Paddle implements GameObject {
     this.gameSettings = gameSettings
   }
 
-  public move(position: Position) {
+  public move(position: PaddlePosition) {
     this.x = position.x
     this.y = position.y
+    this.velocity = position.velocity
   }
 
-  public setVelocity(velocity: number) {
+  public setVelocity(velocity: number, communication: Communication) {
     this.velocity = velocity
+
+    this.publish(communication, true)
   }
 
-  public updatePosition(communication: Communication): Paddle {
+  public updatePosition(communication?: Communication): Paddle {
     if (this.velocity !== 0) {
       this.y += this.velocity
 
@@ -45,17 +52,25 @@ export default abstract class Paddle implements GameObject {
         this.y = maxPaddleY
       }
 
+      if (communication) {
+        this.publish(communication)
+      }
+    }
+
+    return this
+  }
+
+  public publish(communication: Communication, force?: boolean) {
+    if (this.lastPublishTime + publishPeriod < Date.now() || force) {
       communication.publish({
         type: PongSignalsEnum.MovePaddle,
         x: this.x,
         y: this.y,
+        v: this.velocity,
         position: this.getPaddlePosition(),
       } as MovePaddleMessage)
-
-      // dispatchEvent(new CustomEvent<MovePaddleMessage>(PongEventsEnum.MovePaddle, {detail: movePaddleMessage}))
+      this.lastPublishTime = Date.now()
     }
-
-    return this
   }
 
   public draw(context: CanvasRenderingContext2D) {

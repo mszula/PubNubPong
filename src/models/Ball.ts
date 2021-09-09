@@ -6,7 +6,7 @@ import BallPosition from "./BallPosition"
 import MoveBallMessage from "./message/MoveBalllMessage"
 import Paddle from "./Paddle"
 
-const publishPeriod = 100
+const publishPeriod = 200
 
 export default class Ball implements GameObject {
   x: number = 0

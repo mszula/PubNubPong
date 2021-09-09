@@ -103,7 +103,7 @@ export class Pong {
     this.ball.updatePosition(this.communication).draw(this.context)
 
     this.me.paddle.updatePosition(this.communication).draw(this.context)
-    this.opponent.paddle.updatePosition(this.communication).draw(this.context)
+    this.opponent.paddle.updatePosition().draw(this.context)
 
     this.context.fillStyle = "grey"
     this.context.fillRect(
@@ -132,22 +132,22 @@ export class Pong {
     document.addEventListener("keydown", (e: KeyboardEvent) => {
       switch (e.key) {
         case "ArrowUp":
-          this.me.paddle.setVelocity(-this.gameSettings.paddleSpeed)
+          this.me.paddle.setVelocity(-this.gameSettings.paddleSpeed, this.communication)
           break
         case "ArrowDown":
-          this.me.paddle.setVelocity(this.gameSettings.paddleSpeed)
+          this.me.paddle.setVelocity(this.gameSettings.paddleSpeed, this.communication)
           break
       }
     })
 
     document.addEventListener("keyup", (e: KeyboardEvent) => {
       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-        this.me.paddle.setVelocity(0)
+        this.me.paddle.setVelocity(0, this.communication)
       }
     })
 
     addEventListener(PongEventsEnum.MovePaddle, ((e: CustomEvent<MovePaddleMessage>) => {
-      this.opponent.paddle.move({ ...e.detail })
+      this.opponent.paddle.move({ ...e.detail, velocity: e.detail.v })
     }) as EventListener)
 
     addEventListener(PongEventsEnum.MoveBall, ((e: CustomEvent<MoveBallMessage>) => {
