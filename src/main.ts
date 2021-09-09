@@ -37,7 +37,7 @@ const createGameButton = document.getElementById("startGame") as HTMLButtonEleme
 const canvas = document.getElementById("pong") as HTMLCanvasElement
 canvas.height = gameSettings.canvas.height
 canvas.width = gameSettings.canvas.width
-canvas.style.transform = `scale(${window.innerHeight / gameSettings.canvas.height - 0.1})`
+// canvas.style.transform = `scale(${window.innerHeight / gameSettings.canvas.height - 0.1})`
 
 const urlChannelId = getUrlChannelId()
 if (urlChannelId) {
@@ -67,6 +67,18 @@ createGameButton.onclick = () => {
     pong.startGame().gameLoop()
   } else {
     pong = prepareGameAsHost()
+    const urlInput = document.getElementById("urlInput") as HTMLInputElement
+    urlInput.value = window.location.href
+    urlInput.onclick = () => {
+      navigator.clipboard.writeText(urlInput.value).then(() => {
+        const copiedBalloon = document.getElementById("copiedBalloon") as HTMLInputElement
+        copiedBalloon.style.display = "block"
+
+        setTimeout(() => {
+          copiedBalloon.style.display = "none"
+        }, 2000)
+      })
+    }
     const dialogWaiting = document.getElementById("dialogWaiting") as HTMLElement
     dialogWaiting.style.display = "flex"
 
@@ -80,10 +92,8 @@ createGameButton.onclick = () => {
   addEventListener(PongEventsEnum.LeftTheGame, (() => {
     pong?.stopGame()
 
-    const opponentNameSpan = document.getElementById("opponentName")
-    if (opponentNameSpan) {
-      opponentNameSpan.innerHTML = pong?.getOpponentName() || ""
-    }
+    const opponentNameSpan = document.getElementById("opponentName") as HTMLElement
+    opponentNameSpan.innerHTML = pong?.getOpponentName() || ""
 
     const dialogLeftTheGame = document.getElementById("dialogLeftTheGame") as HTMLElement
     dialogLeftTheGame.style.display = "flex"

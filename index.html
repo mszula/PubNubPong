@@ -14,20 +14,27 @@
 
     <div class="dialog" id="dialogStart" style="display: flex;">
       <div class="dialog-content">
-        <p class="title">PubNubPong</p>
+        <p class="title">PubNubPong 🎮</p>
         <p class="nes-text is-error" style="display: none;" id="emptyRoomError">No one is in this room.<br>Please create a new game!</p>
         <p class="nes-text is-error" style="display: none;" id="fullRoomError">This room is full.<br>Please create a new game!</p>
         <div class="nes-field">
           <label for="nameInput">Your name</label>
-          <input type="text" id="nameInput" class="nes-input">
+          <input type="text" id="nameInput" class="nes-input nes-pointer">
         </div>
-        <button class="nes-btn is-primary" id="startGame">Let's pong!</button>
+        <button class="nes-btn is-primary nes-pointer" id="startGame">Let's pong!</button>
       </div>
     </div>
 
     <div class="dialog" id="dialogWaiting">
       <div class="dialog-content">
-          <p class="title" style="margin-bottom: 0;">Waiting for opponent...</p>
+          <p class="title">Waiting for opponent...</p>
+          <div class="nes-field">
+            <label for="urlInput">Give this link to your friend</label>
+            <input type="text" id="urlInput" class="nes-input nes-pointer" readonly>
+            <div class="nes-balloon from-right" id="copiedBalloon">
+              <p>Copied!</p>
+            </div>
+          </div>
       </div>
     </div>
 

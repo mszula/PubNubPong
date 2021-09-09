@@ -13,14 +13,14 @@ import LeftPaddle from "./models/LeftPaddle"
 import RightPaddle from "./models/RightPaddle"
 
 export class Pong {
-  private communication: Communication
-  private canvas: HTMLCanvasElement
-  private context: CanvasRenderingContext2D
+  private readonly communication: Communication
+  private readonly canvas: HTMLCanvasElement
+  private readonly context: CanvasRenderingContext2D
 
-  private gameSettings: GameSettings
-  private ball: Ball
-  private me: Player
-  private opponent: Player
+  private readonly gameSettings: GameSettings
+  private readonly ball: Ball
+  private readonly me: Player
+  private readonly opponent: Player
   private renderGame: boolean
 
   constructor(canvas: HTMLCanvasElement, gameSettings: GameSettings, communication: Communication, me: Player) {
@@ -83,9 +83,11 @@ export class Pong {
     if (myGoal || opponentGoal) {
       this.ball.reset(this.gameSettings)
 
-      setTimeout(() => {
-        this.ball.serve(this.communication)
-      }, 1000)
+      if (this.communication.isHost) {
+        setTimeout(() => {
+          this.ball.serve(this.communication)
+        }, 1000)
+      }
 
       if (myGoal) {
         this.communication.publish({
