@@ -49,10 +49,9 @@ export class Pong {
 
   public startGame(): this {
     this.renderGame = true
-    this.communication.publish({
-      type: PongSignalsEnum.PlayerInfo,
-      name: this.me.name,
-    } as PlayerInfoMessage)
+
+    this.updatePlayerInfo()
+    setInterval(() => this.updatePlayerInfo(), 5000)
 
     if (this.communication.isHost) {
       this.ball.serve(this.communication)
@@ -70,33 +69,17 @@ export class Pong {
   public gameLoop(): this {
     requestAnimationFrame(() => this.renderGame && this.gameLoop())
 
+    this.handleCollisions().handleGoals().draw()
+
+    return this
+  }
+
+  public getOpponentName(): string {
+    return this.opponent.name
+  }
+
+  private draw(): this {
     this.context.fillStyle = "white"
-
-    if (collides(this.ball, this.me.paddle)) {
-      this.ball.bounce(this.me.paddle, this.communication)
-    } else if (collides(this.ball, this.opponent.paddle)) {
-      this.ball.bounce(this.opponent.paddle)
-    }
-
-    const myGoal = this.me.paddle.checkGoal(this.ball, this.gameSettings)
-    const opponentGoal = this.opponent.paddle.checkGoal(this.ball, this.gameSettings)
-    if (myGoal || opponentGoal) {
-      this.ball.reset(this.gameSettings)
-
-      if (this.communication.isHost) {
-        setTimeout(() => {
-          this.ball.serve(this.communication)
-        }, 1000)
-      }
-
-      if (myGoal) {
-        this.communication.publish({
-          type: PongSignalsEnum.Goal,
-          opponentPoints: this.me.points,
-        } as GoalMessage)
-        this.opponent.goal()
-      }
-    }
 
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
@@ -124,8 +107,46 @@ export class Pong {
     return this
   }
 
-  public getOpponentName(): string {
-    return this.opponent.name
+  private updatePlayerInfo() {
+    this.communication.publish({
+      type: PongSignalsEnum.PlayerInfo,
+      name: this.me.name,
+      points: this.me.points,
+    } as PlayerInfoMessage)
+  }
+
+  private handleGoals(): this {
+    const myGoal = this.me.paddle.checkGoal(this.ball, this.gameSettings)
+    const opponentGoal = this.opponent.paddle.checkGoal(this.ball, this.gameSettings)
+    if (myGoal || opponentGoal) {
+      this.ball.reset(this.gameSettings)
+
+      if (this.communication.isHost) {
+        setTimeout(() => {
+          this.ball.serve(this.communication)
+        }, 1000)
+      }
+
+      if (myGoal) {
+        this.communication.publish({
+          type: PongSignalsEnum.Goal,
+          opponentPoints: this.me.points,
+        } as GoalMessage)
+        this.opponent.goal()
+      }
+    }
+
+    return this
+  }
+
+  private handleCollisions(): this {
+    if (collides(this.ball, this.me.paddle)) {
+      this.ball.bounce(this.me.paddle, this.communication)
+    } else if (collides(this.ball, this.opponent.paddle)) {
+      this.ball.bounce(this.opponent.paddle)
+    }
+
+    return this
   }
 
   private addListeners() {

@@ -14,6 +14,7 @@ export default class Player {
 
   public updatePlayerInfo(playerInfoMessage: PlayerInfoMessage) {
     this.name = playerInfoMessage.name
+    this.points = playerInfoMessage.points
   }
 
   public updatePoints(points: number) {

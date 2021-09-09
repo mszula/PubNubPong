@@ -11,6 +11,7 @@ import GoalMessage from "./models/message/GoalMessage"
 export default class Communication {
   isHost: boolean
   private pubnub: Pubnub
+  private lastSignalTimestamp: number = 0
   readonly channelId: string
   readonly uuid: string
 
@@ -40,9 +41,11 @@ export default class Communication {
 
     this.pubnub.addListener({
       signal: (signal: SignalEvent): void => {
-        if (signal.publisher === this.uuid) {
+        if (signal.publisher === this.uuid || Number(signal.timetoken) < this.lastSignalTimestamp) {
           return
         }
+
+        this.lastSignalTimestamp = Number(signal.timetoken)
 
         switch (signal.message.type) {
           case PongSignalsEnum.MovePaddle:
